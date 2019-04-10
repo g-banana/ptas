@@ -3,6 +3,8 @@ import time
 import functools
 import random
 import pickle
+
+
 # import copy
 # import numpy
 
@@ -10,7 +12,8 @@ class Chess:
     '''
     棋盘类，提供私有棋盘，以及落子、判断胜局方法
     '''
-    def __init__(self,size:tuple,win:int):
+
+    def __init__(self, size: tuple, win: int):
         '''
         为实例初始化自己的棋盘大小,定义几连子获胜
         '''
@@ -30,7 +33,7 @@ class Chess:
             str_ += '\n'
         return str_
 
-    def set_position(self,position:tuple,player_id:int):
+    def set_position(self, position: tuple, player_id: int):
         '''
         安插玩家落子位置，利用编号区分不同玩家，提供位置值错误、位置重复校验并抛出相应自定义Inp_excep错误
         :param position: 位置用（x,y）表示
@@ -50,9 +53,9 @@ class Chess:
             raise Inp_excep('该位置已有棋子！')
         self.__state[x][y] = player_id
 
-        return self.__get_result((x,y))
+        return self.__get_result((x, y))
 
-    def __get_result(self,pos):
+    def __get_result(self, pos):
         if self.max_done(pos) >= self.win:
             return self.__state[pos[0]][pos[1]]
         for i in self.__state:
@@ -81,7 +84,7 @@ class Chess:
     #                 return None
     #     return -1
 
-    def max_done(self,position:tuple):
+    def max_done(self, position: tuple):
         '''
         调用__extend_延展八个方向递归求得最大成线值
         :param position: 包含x,y落子位置坐标的元祖
@@ -90,25 +93,25 @@ class Chess:
         done_num = []
         dires = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
         for i in range(4):
-            done_num.append(self.__extend_(position, dires[i]) + 1 + self.__extend_(position, dires[-i-1]))
+            done_num.append(self.__extend_(position, dires[i]) + 1 + self.__extend_(position, dires[-i - 1]))
         max_ = max(done_num)
         # print(max_)
         return max_
         # return max(done_num)
 
-    def __extend_(self,position:tuple,direction:tuple):
+    def __extend_(self, position: tuple, direction: tuple):
         '''
         判定最大成线子数用到的递归延展函数
         :param position: 当前位置（x，y）
         :param direction: 当前延展方向（x，y），abx(x) == abs(y） == 1 表示
         :return: 继续延展成子数量加上本身的1
         '''
-        new_position = (position[0] + direction[0],position[1] + direction[1])
+        new_position = (position[0] + direction[0], position[1] + direction[1])
         if new_position[0] not in range(self.size[0]) or new_position[1] not in range(self.size[1]):
             return 0
         if self.__state[new_position[0]][new_position[1]] and \
                 self.__state[new_position[0]][new_position[1]] == self.__state[position[0]][position[1]]:
-            return self.__extend_(new_position,direction) + 1
+            return self.__extend_(new_position, direction) + 1
         return 0
 
     def get_chess(self):
@@ -117,11 +120,13 @@ class Chess:
     def reset_chess(self):
         self.__state = self.get_chess()
 
+
 class Inp_excep(Exception):
     '''
     用户输入错误总类
     '''
-    def __init__(self,info:str):
+
+    def __init__(self, info: str):
         self.info = info
 
 
@@ -129,7 +134,8 @@ class Player:
     '''
     玩家对象，实例属性有player名称、player_id、对局棋盘。初始化一方法为棋盘落子方法的偏函数
     '''
-    def __init__(self,name:str,id:int,chess:Chess):
+
+    def __init__(self, name: str, id: int, chess: Chess):
         self.name = name
         self.id = id
         self.chess = chess
@@ -142,8 +148,8 @@ class AI(Player):
     '''
 
     def __init__(self, name: str, id: int, chess: Chess):
-        super(AI,self).__init__(name,id,chess)
-        self.virtual_chess = Chess(self.chess.size,self.chess.win)
+        super(AI, self).__init__(name, id, chess)
+        self.virtual_chess = Chess(self.chess.size, self.chess.win)
 
         # self.all_state = self.__get_all_state()
         # with open("3_3.pkl", "wb") as file:
@@ -166,10 +172,10 @@ class AI(Player):
         path = []
         all_state = {'first_win': [], 'second_win': [], 'draw': []};
 
-        self.__iter_fun(chess_flat,path,all_state)
+        self.__iter_fun(chess_flat, path, all_state)
         return all_state
 
-    def __iter_fun(self,chess_flat: list, path: list,all_state):
+    def __iter_fun(self, chess_flat: list, path: list, all_state):
         for sing in chess_flat:
             # 如果当前路径(path)中已包含该位置，则跳过
             if sing in path:
@@ -183,19 +189,19 @@ class AI(Player):
                 path.remove(sing)
                 continue
             # 未结束继续下一层遍历
-            self.__iter_fun(chess_flat, path,all_state)
+            self.__iter_fun(chess_flat, path, all_state)
             # 该分支遍历结束继续遍历该层次下一分支
             path.remove(sing)
             continue
 
-    def __get_result(self,set_list:list):
+    def __get_result(self, set_list: list):
         flag = 1
         id = 1
         for pos in set_list:
             x = (pos - 1) // self.chess.size[1] + 1
             y = (pos - 1) % self.chess.size[1] + 1
             # print(pos)
-            over = self.virtual_chess.set_position((x,y),id)
+            over = self.virtual_chess.set_position((x, y), id)
             if over != None:
                 self.virtual_chess.reset_chess()
                 return over
@@ -208,7 +214,7 @@ class AI(Player):
             self.all_state = pickle.load(file)
         self.me_win = 2
 
-    def feedback(self,player_posion, fault: bool = 0):
+    def feedback(self, player_posion, fault: bool = 0):
         row = self.chess.size[0]
         col = self.chess.size[1]
         if not player_posion:
@@ -227,7 +233,7 @@ class AI(Player):
         self.__shrink(next)
         return (x, y)
 
-    def __shrink(self,ai_position: int):
+    def __shrink(self, ai_position: int):
         for key, values in self.all_state.items():
             len = values.__len__()
             for reverse_index in range(len - 1, -1, -1):
@@ -250,20 +256,20 @@ class AI(Player):
             return min(refer, key=refer.get)
 
 
-
 # 创建各个实例对象
-chess = Chess((3,3),3)
-player_one = Player('玩家一',1,chess)
-player_two = Player('玩家二',2,chess)
+chess = Chess((3, 3), 3)
+player_one = Player('玩家一', 1, chess)
+player_two = Player('玩家二', 2, chess)
+
 
 # 业务逻辑的函数封装：某玩家落子到判断胜负并打印
-def player_inp(player:Player,pre_pos = 0):
+def player_inp(player: Player, pre_pos=0):
     if player.name.startswith('AI'):
         print('正在计算，请稍后...'.format(player.name))
         before = time.clock()
         pos = player.feedback(pre_pos)
         after = time.clock()
-        print('用时{}，{}计算出的落子位置为：({},{})'.format(after-before,player.name,pos[0],pos[1]))
+        print('用时{}，{}计算出的落子位置为：({},{})'.format(after - before, player.name, pos[0], pos[1]))
         res = player.turn_on(list(pos))
         print(player.chess)
     else:
@@ -275,7 +281,7 @@ def player_inp(player:Player,pre_pos = 0):
                 print(player.chess)
                 break
             except Inp_excep as err:
-                print(err.info,end=' ')
+                print(err.info, end=' ')
                 continue
             except:
                 print('输入行列号即可，以空格为区分\t', end=' ')
@@ -294,7 +300,6 @@ def player_inp(player:Player,pre_pos = 0):
     return pre_pos
 
 
-
 inp = input('输入1进入AI对战模式，输入2进入双人对战模式：')
 if inp == '2':
     while True:
@@ -302,7 +307,7 @@ if inp == '2':
             player_inp(player_one)
             player_inp(player_two)
         except Inp_excep as err:
-            print(err.info,end='\t')
+            print(err.info, end='\t')
             input('按下回车继续开始下一局...')
             print('\n已开启新一轮')
 
@@ -314,16 +319,14 @@ if inp == '1':
     print('AI创建成功，用时：', after - before)
 
     player_inp(AI_nine)
-    while(True):
+    while (True):
         try:
             pre_pos = player_inp(player_one)
-            player_inp(AI_nine,pre_pos)
+            player_inp(AI_nine, pre_pos)
         except Inp_excep as err:
-            print(err.info,end='\t')
+            print(err.info, end='\t')
             input('按下回车继续开始下一局...')
             AI_nine.reset_AI()
             print('\n已开启新一轮')
 
             player_inp(AI_nine)
-
-    
