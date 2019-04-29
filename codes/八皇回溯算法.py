@@ -63,56 +63,60 @@
 
 NUM = 0
 
-def getTab(row,col):
+
+def getTab(row, col):
     return [[0 for x in range(col)] for x in range(row)]
 
-def printResultAsTab(result,row,col):
-    tab = getTab(row,col)
+
+def printResultAsTab(result,row, col):
+    tab = getTab(row, col)
     for position in result:
         tab[position[0]][position[1]] = 1
     for line in tab:
         print(line)
 
-def setTab(tab,x,y,z=1):
+
+def setTab(tab, x, y, z=1):
     # if z==1:
-        for i in range(len(tab)):
-            for j in range(len(tab[0])):
-                if i==x or j==y or i+j==x+y or i-j==x-y:
-                    # tab[i][j] += 1
-                    tab[i][j] += z
-    # if z==-1:
-    #     for i in range(len(tab)):
-    #         for j in range(len(tab[0])):
-    #             if i==x or j==y or i+j==x+y or i-j==x-y:
-    #                 tab[i][j] -= 1
+    for i in range(len(tab)):
+        for j in range(len(tab[0])):
+            if i == x or j == y or i + j == x + y or i - j == x - y:
+                # tab[i][j] += 1
+                tab[i][j] += z
+
+
+# if z==-1:
+#     for i in range(len(tab)):
+#         for j in range(len(tab[0])):
+#             if i==x or j==y or i+j==x+y or i-j==x-y:
+#                 tab[i][j] -= 1
 
 # def ifNotHit(tab,x):
 #     for i in range(len(tab[0])):
 #         if tab[x][i] < 1:
 #             return 1
 
-def serch(tab,row=0,result=[]):
+def serch(tab, row=0, result=[]):
     if row < len(tab):
         # if ifNotHit(tab, row):
-            for i in range(len(tab[0])):
-                if tab[row][i] < 1:
-                    result.append((row,i))
-                    setTab(tab,row,i)
-                    serch(tab,row+1,result)
+        for i in range(len(tab[0])):
+            if tab[row][i] < 1:
+                result.append((row, i))
+                setTab(tab, row, i)
+                serch(tab, row + 1, result)
 
-                    setTab(tab,row,i,-1)
-                    result.pop()
+                setTab(tab, row, i, -1)
+                result.pop()
     else:
-        printResultAsTab(result,len(tab),len(tab[0]))
+        printResultAsTab(result, len(tab), len(tab[0]))
         print('-' * 20)
         global NUM
         NUM += 1
 
 
-
-tab = getTab(8,8)
+tab = getTab(8, 8)
 serch(tab)
-print('total: ',NUM)
+print('total: ', NUM)
 
 # setTab(tab,1,1)
 # # setTab(tab,1,1,-1)

@@ -1,4 +1,3 @@
-
 class tryNum:
     '''
     作用：根据取得信息猜测数字总类：
@@ -6,7 +5,7 @@ class tryNum:
     实现原理：列出所有组合集合，根据条件每轮进行筛选，最后剩下一个正确答案
     '''
 
-    def __init__(self,value = 1234):
+    def __init__(self, value=1234):
         '''
         构造猜数对象，调用自身函数初始化包含所有可能结果的集合；可指定首次猜测的数值
         :param value: 首次猜测数值
@@ -27,12 +26,12 @@ class tryNum:
         供调用获取初始参数
         :return:包含所有可能结果的迭代器
         '''
-        return filter(lambda x:str(x)[0] != str(x)[1] != str(x)[2] != str(x)[3] \
-                               and str(x)[0] != str(x)[3] != str(x)[1] and str(x)[0] != str(x)[2] \
-                               and str(x)[0] != '0' and str(x)[1] != '0' and str(x)[2] != '0' and str(x)[3] != '0',
-                      {x for x in range(1234,9877)})
+        return filter(lambda x: str(x)[0] != str(x)[1] != str(x)[2] != str(x)[3] \
+                                and str(x)[0] != str(x)[3] != str(x)[1] and str(x)[0] != str(x)[2] \
+                                and str(x)[0] != '0' and str(x)[1] != '0' and str(x)[2] != '0' and str(x)[3] != '0',
+                      {x for x in range(1234, 9877)})
 
-    def shrink(self,lastValue,numb_correct,posi_correct = -1):
+    def shrink(self, lastValue, numb_correct, posi_correct=-1):
         '''
         核心函数，根据传入值缩减可能的答案范围，更新初始迭代器为可变集合
         ：param lastValue: 上一猜测数值
@@ -42,9 +41,9 @@ class tryNum:
         '''
         numbat = set()
         for numb in self.__numbs:
-            a,b = 0,0
+            a, b = 0, 0
             nubstr = str(numb)
-            lastValueStr =str(lastValue)
+            lastValueStr = str(lastValue)
             for i in range(4):
                 if nubstr[i] in lastValueStr:
                     a += 1
@@ -63,12 +62,14 @@ class BusiError(Exception):
     '''程序异常错误信息总类'''
     pass
 
+
 class UserInputError(BusiError):
     '''用户输入格式错误
     err_input: 用户错误的输入
     err_info: 记录提示信息
     '''
-    def __init__(self,err_input,out_info):
+
+    def __init__(self, err_input, out_info):
         self.err_input = err_input
         self.out_info = out_info
 
@@ -77,10 +78,9 @@ class UserDataError(BusiError):
     '''用户输入数据失误错误
     err_info: 记录提示信息
     '''
-    def __init__(self,info = None):
+
+    def __init__(self, info=None):
         self.err_info = info
-
-
 
 
 import re
@@ -90,7 +90,7 @@ import win32com.client
 fac = tryNum()
 speaker = win32com.client.Dispatch("SAPI.SpVoice")
 
-#以下为业务逻辑部分：
+# 以下为业务逻辑部分：
 speaker.speak("准备好了吗晓丽小仙女")
 while True:
     print('计算机：准备猜数？\t(开始:yes，猜对:ok，\
@@ -108,16 +108,16 @@ while True:
             if get_in == 'ok':
                 break
             while not re.match('[0-9],[0-9]', get_in) and get_in is not 'ok':
-               get_in = input('命令格式错误，请重新输入：')
+                get_in = input('命令格式错误，请重新输入：')
             get_in = get_in.split(',')
-            if not(int(get_in[0]) in range(5) and int(get_in[0]) >= int(get_in[1])):
+            if not (int(get_in[0]) in range(5) and int(get_in[0]) >= int(get_in[1])):
                 print('数据明显错误，此次判定跳过')
                 continue
 
             try:
                 value = fac.shrink(value, int(get_in[0]), int(get_in[1]))
             except userdataerror as err:
-                print(err.err_info,'\t请开始新一轮。')
+                print(err.err_info, '\t请开始新一轮。')
                 flag = False
                 break;
         fac.res()
@@ -129,6 +129,4 @@ while True:
         break
 print('计算机：程序结束。')
 
-
 # print(len(fac._tryNum__numbs),6*7*8*9)
-

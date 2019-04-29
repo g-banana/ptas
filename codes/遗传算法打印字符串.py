@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pyecharts as pe
+
 
 class GeneticAlgorithm(object):
     """遗传算法.
@@ -68,13 +70,14 @@ class GeneticAlgorithm(object):
 
     # 进化
     def evolution(self):
-        self.max_fitness_line = []
+        self.max_fitness_list = []
         population = self.init_population()
         for i in range(self.n_iterations):
             fitness = self.fitness(population)
 
             max_fitness = np.max(fitness)
-            self.max_fitness_line.append(max_fitness)
+            # print(max_fitness/self.password_size)
+            self.max_fitness_list.append(max_fitness)
 
             best_person = population[np.argmax(fitness)]
             best_person_ascii = self.translateDNA(best_person)
@@ -84,6 +87,10 @@ class GeneticAlgorithm(object):
 
             if best_person_ascii == self.password:
                 print(u'第%-4d次进化后, 已找到目标字串: \t %s' % (i, best_person_ascii))
+                # print(self.max_fitness_list[-1],self.password_size,  np.array(self.max_fitness_list )[-1]/ self.password_size)
+                matlib_draw(plt, self.max_fitness_list, self.password_size)
+                rend_html(list(range( len(self.max_fitness_list) )),
+                          np.array(self.max_fitness_list) / self.password_size)
                 break
 
             population = self.select(population)
@@ -94,19 +101,28 @@ class GeneticAlgorithm(object):
                 child = self.mutate_child(child)
                 parent = child
 
-        plt.plot(np.array( self.max_fitness_line )/self.password_size,list(range(1,len(self.max_fitness_line)+1)))
-        plt.xlabel('Fitness: the percentage of characters that match')
-        plt.ylabel('Population iterative algebra')
 
+
+def matlib_draw(plt, max_fitness_list, password_size):
+    plt.plot(np.array(max_fitness_list) / password_size, list(range(1, len(max_fitness_list) + 1)))
+    plt.xlabel('Fitness: the percentage of characters that matched')
+    plt.ylabel('Population iterative algebra')
+    plt.show()
+
+
+def rend_html(x, y):
+    line = pe.Line('适应度-迭代次数 曲线')
+    line.add('', x, y)
+    line.render("../Hello.html")
 
 
 def main():
     password = 'Hello,201621123027'  # 要破解的密码
-
-    ga = GeneticAlgorithm(cross_rate=0.8, mutation_rate=0.01, n_population=300, n_iterations=500, password=password)
-
+    ga = GeneticAlgorithm(cross_rate=0.8, mutation_rate=0.01, n_population=1000, n_iterations=1000, password=password)
     ga.evolution()
 
 
 if __name__ == '__main__':
+    # bef = time.clock()
     main()
+    # print('用时：', time.clock() - bef)

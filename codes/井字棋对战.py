@@ -1,5 +1,5 @@
 # 穷举出所有可能棋局情况作为判断输入，选择胜率最高的位置下子
-import time
+# import time
 import functools
 import random
 import pickle
@@ -151,11 +151,11 @@ class AI(Player):
         super(AI, self).__init__(name, id, chess)
         self.virtual_chess = Chess(self.chess.size, self.chess.win)
 
-        # self.all_state = self.__get_all_state()
-        # with open("3_3.pkl", "wb") as file:
+        self.all_state = self.__get_all_state()
+        # with open("../3_3.pkl", "wb") as file:
         #     pickle.dump(self.all_state, file, True)
 
-        with open("3_3.pkl", "rb") as file:
+        with open("../3_3.pkl", "rb") as file:
             self.all_state = pickle.load(file)
         self.me_win = 2
 
@@ -313,10 +313,10 @@ if inp == '2':
 
 if inp == '1':
     print('请等候AI创建(大约两分钟)...')
-    before = time.clock()
+    # before = time.clock()
     AI_nine = AI('AI_nine', 9, chess)
-    after = time.clock()
-    print('AI创建成功，用时：', after - before)
+    # after = time.clock()
+    # print('AI创建成功，用时：', after - before)
 
     player_inp(AI_nine)
     while (True):
